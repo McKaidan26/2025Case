@@ -24,21 +24,24 @@ export default function TopBar() {
     <ThemedView style={styles.container}>
       <ThemedText type="title">Your Portal</ThemedText>
       
-      <Pressable 
-        style={styles.avatarContainer} 
-        onPress={handleProfilePress}
-      >
-        <View style={[
-          styles.avatarRing,
-          user ? styles.loggedInRing : styles.loggedOutRing
-        ]}>
-          <FontAwesome 
-            name="user-circle" 
-            size={35} 
-            color={user ? '#A1CEDC' : 'rgba(161, 206, 220, 0.5)'}
-          />
-        </View>
-      </Pressable>
+      <View style={styles.rightContainer}>
+        <ThemedText style={styles.streakText}>157 Day Streak</ThemedText>
+        <Pressable 
+          style={styles.avatarContainer} 
+          onPress={handleProfilePress}
+        >
+          <View style={[
+            styles.avatarRing,
+            user ? styles.loggedInRing : styles.loggedOutRing
+          ]}>
+            <FontAwesome 
+              name="user-circle" 
+              size={35} 
+              color={user ? '#A1CEDC' : 'rgba(161, 206, 220, 0.5)'}
+            />
+          </View>
+        </Pressable>
+      </View>
 
       <LoginModal 
         visible={showLoginModal} 
@@ -76,5 +79,15 @@ const styles = StyleSheet.create({
   },
   loggedOutRing: {
     borderColor: '#FF4444',  // Red
+  },
+  rightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  streakText: {
+    color: '#FFD700',
+    fontWeight: '600',
+    fontSize: 14,
   },
 }); 

@@ -1,4 +1,4 @@
-import { StyleSheet, Pressable, ScrollView } from 'react-native';
+import { StyleSheet, Pressable, ScrollView, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { useState, useEffect } from 'react';
@@ -12,6 +12,7 @@ export default function ChatScreen() {
   const { user } = useAuth();
   const [chatMode, setChatMode] = useState<ChatMode>(null);
   const [firstName, setFirstName] = useState('');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -22,6 +23,12 @@ export default function ChatScreen() {
     };
     fetchUserName();
   }, [user]);
+
+  const handleSend = () => {
+    if (message.trim()) {
+      setMessage('');
+    }
+  };
 
   if (!user) {
     return (
@@ -41,38 +48,56 @@ export default function ChatScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      {/* Welcome Message Bubble */}
-      <ThemedView style={styles.welcomeContainer}>
-        <ThemedView style={styles.welcomeBubble}>
-          <ThemedText style={styles.welcomeText}>
-            Hello, {firstName}! How can I help?
-          </ThemedText>
+      <ThemedView style={styles.mainContent}>
+        {/* Welcome Message Bubble */}
+        <ThemedView style={styles.welcomeContainer}>
+          <ThemedView style={styles.welcomeBubble}>
+            <ThemedText style={styles.welcomeText}>
+              Hello, {firstName || 'John'}! How can I help?
+            </ThemedText>
+          </ThemedView>
+        </ThemedView>
+
+        {/* Chat Option Bubbles */}
+        <ThemedView style={styles.optionsContainer}>
+          <Pressable onPress={() => setChatMode('medications')}>
+            <ThemedView style={styles.optionBubble}>
+              <ThemedText style={styles.optionText}>
+                Questions about medications 💊
+              </ThemedText>
+            </ThemedView>
+          </Pressable>
+
+          <Pressable onPress={() => setChatMode('sideEffects')}>
+            <ThemedView style={styles.optionBubble}>
+              <ThemedText style={styles.optionText}>
+                Questions about side effects 🏥
+              </ThemedText>
+            </ThemedView>
+          </Pressable>
+
+          <Pressable onPress={() => setChatMode('resources')}>
+            <ThemedView style={styles.optionBubble}>
+              <ThemedText style={styles.optionText}>
+                Questions about HIV resources ℹ️
+              </ThemedText>
+            </ThemedView>
+          </Pressable>
         </ThemedView>
       </ThemedView>
 
-      {/* Chat Option Bubbles */}
-      <ThemedView style={styles.optionsContainer}>
-        <Pressable onPress={() => setChatMode('medications')}>
-          <ThemedView style={styles.optionBubble}>
-            <ThemedText style={styles.optionText}>
-              Questions about medications 💊
-            </ThemedText>
-          </ThemedView>
-        </Pressable>
-
-        <Pressable onPress={() => setChatMode('sideEffects')}>
-          <ThemedView style={styles.optionBubble}>
-            <ThemedText style={styles.optionText}>
-              Questions about side effects 🏥
-            </ThemedText>
-          </ThemedView>
-        </Pressable>
-
-        <Pressable onPress={() => setChatMode('resources')}>
-          <ThemedView style={styles.optionBubble}>
-            <ThemedText style={styles.optionText}>
-              Questions about HIV resources ℹ️
-            </ThemedText>
+      {/* Centered Input Bar */}
+      <ThemedView style={styles.inputBar}>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Type a message..."
+          placeholderTextColor="#A1CEDC"
+          value={message}
+          onChangeText={setMessage}
+        />
+        <Pressable onPress={handleSend}>
+          <ThemedView style={styles.sendButton}>
+            <ThemedText style={styles.sendButtonText}>Send</ThemedText>
           </ThemedView>
         </Pressable>
       </ThemedView>
@@ -82,6 +107,9 @@ export default function ChatScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  mainContent: {
     flex: 1,
     padding: 20,
   },
@@ -126,5 +154,39 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'rgba(161, 206, 220, 0.8)',
     fontWeight: '500',
+  },
+  inputBar: {
+    flexDirection: 'row',
+    padding: 10,
+    borderTopWidth: 2,
+    borderTopColor: '#A1CEDC',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1D3D47',
+    width: '100%',
+    position: 'absolute',
+    bottom: 0,
+  },
+  textInput: {
+    flex: 1,
+    height: 40,
+    borderWidth: 2,
+    borderColor: '#A1CEDC',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    marginRight: 10,
+    color: '#fff',
+    maxWidth: '70%',
+    backgroundColor: 'rgba(161, 206, 220, 0.1)',
+  },
+  sendButton: {
+    backgroundColor: '#A1CEDC',
+    padding: 10,
+    borderRadius: 20,
+    paddingHorizontal: 20,
+  },
+  sendButtonText: {
+    color: '#1D3D47',
+    fontWeight: 'bold',
   },
 }); 

@@ -1,10 +1,11 @@
-import { StyleSheet, Modal, View, ScrollView } from 'react-native';
+import { StyleSheet, Modal, View, ScrollView, TextInput, Pressable, ViewStyle } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import type { DateData } from 'react-native-calendars';
 import { useState } from 'react';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import Slider from '@react-native-community/slider';
+import { Ionicons } from '@expo/vector-icons';
 
 interface Event {
   title: string;
@@ -14,9 +15,15 @@ interface Event {
 
 interface HealthCheckIn {
   mood: number;
-  stress: number;
   medication: boolean;
   date: string;
+  symptoms: {
+    fatigue: boolean;
+    fever: boolean;
+    nausea: boolean;
+    headache: boolean;
+  };
+  otherSymptoms?: string;
 }
 
 interface Visit {
@@ -32,6 +39,13 @@ export default function CalendarScreen() {
   const [mood, setMood] = useState(10);
   const [medication, setMedication] = useState(true);
   const [healthCheckIns, setHealthCheckIns] = useState<HealthCheckIn[]>([]);
+  const [symptoms, setSymptoms] = useState({
+    fatigue: false,
+    fever: false,
+    nausea: false,
+    headache: false,
+  });
+  const [otherSymptoms, setOtherSymptoms] = useState('');
   
   // Function to get last Friday of a month
   const getLastFriday = (year: number, month: number): string => {
@@ -140,17 +154,24 @@ export default function CalendarScreen() {
   const handleSaveCheckIn = () => {
     const checkIn: HealthCheckIn = {
       mood,
-      stress: 5, // Assuming a default stress level
       medication,
-      date: selectedDate
+      date: selectedDate,
+      symptoms,
+      otherSymptoms: otherSymptoms.trim(),
     };
     setHealthCheckIns(prev => {
-      // Remove any existing check-in for this date
       const filtered = prev.filter(item => item.date !== selectedDate);
-      // Add the new check-in
       return [...filtered, checkIn];
     });
     setModalVisible(false);
+    // Reset symptoms for next check-in
+    setSymptoms({
+      fatigue: false,
+      fever: false,
+      nausea: false,
+      headache: false,
+    });
+    setOtherSymptoms('');
   };
 
   const existingCheckIn = healthCheckIns.find(item => item.date === selectedDate);
@@ -179,8 +200,27 @@ export default function CalendarScreen() {
     return colors[value];
   };
 
+  const toggleSymptom = (symptom: keyof typeof symptoms) => {
+    setSymptoms(prev => ({
+      ...prev,
+      [symptom]: !prev[symptom]
+    }));
+  };
+
   return (
     <ThemedView style={styles.container}>
+      {/* Add Legend */}
+      <ThemedView style={styles.legendContainer}>
+        <ThemedView style={styles.legendItem}>
+          <ThemedView style={[styles.legendDot, { backgroundColor: '#4CAF50' }]} />
+          <ThemedText style={styles.legendText}>Daily Medication Taken</ThemedText>
+        </ThemedView>
+        <ThemedView style={styles.legendItem}>
+          <ThemedView style={[styles.legendDot, { backgroundColor: '#FF5252' }]} />
+          <ThemedText style={styles.legendText}>Daily Medication Missed</ThemedText>
+        </ThemedView>
+      </ThemedView>
+
       <Calendar
         onDayPress={handleDayPress}
         markedDates={getMarkedDates()}
@@ -199,6 +239,8 @@ export default function CalendarScreen() {
           todayTextColor: '#ffffff',
           todayFontWeight: 'bold',
           todayFontSize: 16,
+          monthTextColor: '#ffffff',
+          textMonthFontSize: 16,
         }}
       />
 
@@ -226,12 +268,23 @@ export default function CalendarScreen() {
                   </ThemedText>
                 </ThemedView>
                 
-                <ThemedText type="defaultSemiBold" style={styles.visitTitle}>
-                  {event.title}
-                </ThemedText>
-                <ThemedText style={styles.visitDescription}>
-                  {event.description}
-                </ThemedText>
+                <ThemedView style={styles.visitContent}>
+                  <ThemedView style={styles.visitInfo}>
+                    <ThemedText type="defaultSemiBold" style={styles.visitTitle}>
+                      {event.title}
+                    </ThemedText>
+                    <ThemedText style={styles.visitDescription}>
+                      {event.description}
+                    </ThemedText>
+                  </ThemedView>
+
+                  <Pressable style={styles.calendarButton}>
+                    <Ionicons name="calendar-outline" size={24} color="#A1CEDC" />
+                    <ThemedText style={styles.calendarButtonText}>
+                      Add to Calendar
+                    </ThemedText>
+                  </Pressable>
+                </ThemedView>
               </ThemedView>
             ))}
         </ScrollView>
@@ -288,6 +341,38 @@ export default function CalendarScreen() {
               </ThemedView>
             </ThemedView>
 
+            <ThemedView style={styles.symptomsContainer}>
+              <ThemedText type="defaultSemiBold">Symptoms</ThemedText>
+              <ThemedView style={styles.symptomsGrid}>
+                {Object.entries(symptoms).map(([key, value]) => (
+                  <ThemedView key={key} style={styles.symptomContainer}>
+                    <ThemedView 
+                      style={[
+                        styles.symptomBox, 
+                        value && styles.symptomActive
+                      ]}
+                      onTouchEnd={() => toggleSymptom(key as keyof typeof symptoms)}
+                    >
+                      <ThemedText>{key.charAt(0).toUpperCase() + key.slice(1)}</ThemedText>
+                    </ThemedView>
+                  </ThemedView>
+                ))}
+              </ThemedView>
+              
+              <ThemedView style={styles.otherSymptomsContainer}>
+                <ThemedText>Other Symptoms:</ThemedText>
+                <TextInput
+                  style={styles.otherSymptomsInput}
+                  value={otherSymptoms}
+                  onChangeText={setOtherSymptoms}
+                  placeholder="Enter any other symptoms..."
+                  placeholderTextColor="rgba(255,255,255,0.5)"
+                  multiline
+                  numberOfLines={2}
+                />
+              </ThemedView>
+            </ThemedView>
+
             <ThemedView style={styles.buttonContainer}>
               <ThemedView 
                 style={styles.button}
@@ -321,7 +406,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 30,
   },
   modalOverlay: {
     flex: 1,
@@ -369,7 +454,7 @@ const styles = StyleSheet.create({
   toggleButton: {
     padding: 10,
     borderRadius: 5,
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
     width: 80,
     alignItems: 'center',
   },
@@ -386,7 +471,7 @@ const styles = StyleSheet.create({
   button: {
     padding: 10,
     borderRadius: 5,
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
     flex: 1,
     alignItems: 'center',
   },
@@ -400,25 +485,32 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 20,
     paddingHorizontal: 10,
+    backgroundColor: 'rgba(161, 206, 220, 0.05)',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 15,
+    marginHorizontal: -20,
+    paddingBottom: 20,
   },
   visitsScrollView: {
     marginTop: 10,
   },
   sectionTitle: {
     marginBottom: 15,
-    paddingHorizontal: 10,
+    paddingHorizontal: 30,
   },
   visitCard: {
-    backgroundColor: 'rgba(161, 206, 220, 0.1)',
+    backgroundColor: 'rgba(29, 61, 71, 0.3)',
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
-    marginHorizontal: 10,
+    marginHorizontal: 30,
   },
   visitHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 5,
+    backgroundColor: 'transparent',
   },
   visitTime: {
     color: '#A1CEDC',
@@ -429,5 +521,96 @@ const styles = StyleSheet.create({
   visitDescription: {
     fontSize: 14,
     opacity: 0.8,
+  },
+  textInput: {
+    width: '100%',
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginTop: 5,
+    padding: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  symptomsContainer: {
+    width: '100%',
+    marginTop: 15,
+    gap: 5,
+  },
+  symptomsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    justifyContent: 'center',
+    marginTop: 5,
+  },
+  symptomContainer: {
+    width: '45%',
+    alignItems: 'center',
+  },
+  symptomBox: {
+    width: '100%',
+    aspectRatio: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 5,
+  },
+  symptomActive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  otherSymptomsContainer: {
+    width: '100%',
+    marginTop: 5,
+  },
+  otherSymptomsInput: {
+    width: '100%',
+    marginTop: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    borderRadius: 8,
+    padding: 10,
+    color: '#fff',
+    minHeight: 60,
+  },
+  legendContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 5,
+    marginBottom: 10,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  } as ViewStyle,
+  legendText: {
+    fontSize: 12,
+  },
+  visitContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    backgroundColor: 'transparent',
+  },
+  visitInfo: {
+    flex: 1,
+    marginRight: 10,
+    backgroundColor: 'transparent',
+  },
+  calendarButton: {
+    alignItems: 'center',
+    paddingLeft: 10,
+    backgroundColor: 'transparent',
+  },
+  calendarButtonText: {
+    fontSize: 10,
+    color: '#A1CEDC',
+    marginTop: 4,
+    textAlign: 'center',
   },
 }); 

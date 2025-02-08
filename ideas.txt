@@ -29,3 +29,5 @@ Receive alerts for patients at risk of treatment failure.
 Review model-generated regimen recommendations.
 
 Reward users for consistent check-ins, adherence, or achieving health milestones (e.g., "10 days of perfect adherence" badges).
+
+Side Effect Tracking: Summarize patient-reported side effects and how they align with current treatment.
