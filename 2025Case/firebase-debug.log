@@ -1,0 +1,24 @@
+[debug] [2025-02-07T21:19:55.417Z] ----------------------------------------------------------------------
+[debug] [2025-02-07T21:19:55.419Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\aidan\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js
+[debug] [2025-02-07T21:19:55.419Z] CLI Version:   13.27.0
+[debug] [2025-02-07T21:19:55.419Z] Platform:      win32
+[debug] [2025-02-07T21:19:55.419Z] Node Version:  v20.18.0
+[debug] [2025-02-07T21:19:55.420Z] Time:          Fri Feb 07 2025 16:19:55 GMT-0500 (Eastern Standard Time)
+[debug] [2025-02-07T21:19:55.420Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-02-07T21:19:55.422Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2025-02-07T21:19:55.447Z] TypeError: Cannot read properties of undefined (reading '0')
+    at Command.<anonymous> (C:\Users\aidan\AppData\Roaming\npm\node_modules\firebase-tools\lib\index.js:58:21)
+    at Command.listener [as _actionHandler] (C:\Users\aidan\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\commander\index.js:413:31)
+    at Command._parseCommand (C:\Users\aidan\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\commander\index.js:914:14)
+    at Command.parse (C:\Users\aidan\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\commander\index.js:717:10)
+    at Object.<anonymous> (C:\Users\aidan\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js:129:22)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:174:12)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-02-07T21:19:55.606Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-02-07T21:19:55.606Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
